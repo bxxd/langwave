@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "langwave"
+version = "0.1.0"
+description = "Langchain core wrapper with alphawave"
+authors = []
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+langchain = "^0.0.240"
+openai = "^0.27.8"
+environs = "^9.5.0"
+asyncio = "^3.4.3"
+termcolor = "^2.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
