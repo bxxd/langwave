@@ -98,6 +98,11 @@ def get_sections(file_path):
 
     def add_section(text, cnt):
         nonlocal complete_sections, start
+
+        ## low information sections
+        if len(text) <= 150:
+            return
+
         section = SimpleNamespace()
         section.text = text
         section.cnt = cnt

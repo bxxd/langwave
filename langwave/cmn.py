@@ -11,4 +11,4 @@ logging.basicConfig(stream=sys.stdout, level=LOG_LEVEL, format=LOG_FORMAT)
 
 log = logging.getLogger(__name__)
 
-log.info("init..")
+# log.info("langwave init..")
