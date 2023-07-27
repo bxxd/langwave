@@ -5,6 +5,8 @@ from typing import Any, Dict, List
 # from langchain.memory.buffer_window import ConversationBufferWindowMemory
 from langchain.memory import ChatMessageHistory
 
+
 class VolatileMemory(ChatMessageHistory):
     """An in-memory store that lives for the length of the process."""
+
     pass
