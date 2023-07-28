@@ -52,20 +52,33 @@ def get_elements(element):
             s.text = f"{clean_text(child.text)}"
             s.type = "span"
             style = child.get("style", "")
-            weight = 0
-            if "font-weight" in style:
-                weight = int(style.split("font-weight:")[1].split(";")[0])
-                if weight > 400:
-                    s.type = "h2"
-            # print(f"span style: `{style}` child: `{child}`")
-            # print(f"s type: `{s.type}` text: `{s.text}` weight: `{weight}`")
+            style_elements = style.split(";")
+
+            weight = None
+            italics = None
+
+            for element in style_elements:
+                if "font-weight" in element:
+                    weight = int(element.split("font-weight:")[1])
+                if "font-style" in element:
+                    italics = element.split("font-style:")[1] == "italic"
+
+            if weight is not None and weight > 400:
+                s.type = "h2"
+                # print(f"span style: `{style}` child: `{child}`")
+                if italics:
+                    s.type = "h3"
+            elif italics:
+                s.type = "h4"
+
+                # print(f"s type: `{s.type}` text: `{s.text}` weight: `{weight}`")
             texts.append(s)
         else:
             texts.extend(get_elements(child))
     return texts
 
 
-def get_sections(file_path):
+def get_sections(file_path, break_on_h3=True):
     if not file_path:
         raise ValueError("file_path is required")
     if not "htm" in file_path:
@@ -96,6 +109,10 @@ def get_sections(file_path):
 
     toc = 0
 
+    breaks = ["h2"]
+    if break_on_h3:
+        breaks.append("h3")
+
     def add_section(text, cnt):
         nonlocal complete_sections, start
 
@@ -117,8 +134,12 @@ def get_sections(file_path):
                 and ("table of contents" not in lowered and "index" not in lowered)
             ):
                 start = True
-                print(f"Found start")
+                # print(f"Found start")
                 complete_sections = [section]
+
+        return section
+
+    last_section = None
 
     for s in sections[:]:
         text = s.text
@@ -127,7 +148,7 @@ def get_sections(file_path):
 
         lowered = text.lower()
         if lowered.startswith("table of contents"):
-            print(f"Found table of contents: `{text}` {toc}")
+            # print(f"Found table of contents: `{text}` {toc}")
             if toc >= 2:
                 continue
 
@@ -139,41 +160,55 @@ def get_sections(file_path):
 
         # print(f"{s.type}: `{text}`")
 
-        if s.type == "h2":
+        ## breaking on h2, maybe h3 if set
+        ## h2 only leads to bigger sections, but more complete
+        if s.type in breaks:
             if (
                 "item 6" in lowered and "exhibits" in lowered
             ) or "signatures" in lowered:
-                log.info(f"Found end: `{text}`")
+                # log.info(f"Found end: `{text}`")
                 break
             if part and span_found:
                 cnt += 1
-                log.info(f"creating section {cnt}")
-                add_section(part, cnt)
-                section = None
+                # log.info(f"creating section {cnt}")
+                last_section = add_section(part, cnt)
+                # section = None
                 # print(f"section: `{section.text}`")
                 part = f"*{text}*"
                 span_found = False
-
-            if part:
-                part = f"{part} *{text}*"
             else:
-                part = f"*{text}*"
+                if part:
+                    part = f"{part} *{text}*"
+                else:
+                    part = f"*{text}*"
 
-        elif s.type in ["span", "table"]:
+        else:
+            if not span_found:
+                # use previous section if cont.
+                if lowered.startswith("(cont.)") and last_section:
+                    part = last_section.text
+                    complete_sections = complete_sections[:-1]
+                    text.replace("(cont.)", "")
+                    if len(text) < 20:
+                        continue
+
             span_found = True
             if part:
                 part = f"{part} {text}"
             else:
                 part = text
 
+        # log.info(f"part: `{part}`")
+
     if part:
-        add_section(part, cnt)
+        add_section(part, cnt + 1)
 
     return complete_sections
 
 
 async def main(args):
     sections = get_sections(args.filing)
+
     for s in sections:
         print(f"### section {s.cnt}:\n`{s.text}`")
     log.info(f"have {len(sections)} sections")
