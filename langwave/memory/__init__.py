@@ -1,5 +1,5 @@
-from langwave.memory.volatile import VolatileMemory
-from langwave.memory.fewshot import FewshotMemory
+from langwave.memory.volatile import VolatileChatMemory
+from langwave.memory.fewshot import FewshotChatMemory
 from langwave.memory.mixed import MixedChatMemory
 
-__all__ = ["VolatileMemory", "FewshotMemory", "MixedChatMemory"]
+__all__ = ["VolatileChatMemory", "FewshotChatMemory", "MixedChatMemory"]

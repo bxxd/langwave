@@ -4,7 +4,7 @@ from termcolor import colored
 
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langwave.memory import VolatileMemory
+from langwave.memory import VolatileChatMemory
 from langchain.chains import ConversationalRetrievalChain
 
 from langchain.chains import LLMChain
@@ -58,7 +58,7 @@ async def streaming_chain_console(args):
         temperature=0,
         verbose=args.debug,
     )
-    history = VolatileMemory()
+    history = VolatileChatMemory()
     user_input = args.initial
 
     # human_message_prompt = HumanMessagePromptTemplate(

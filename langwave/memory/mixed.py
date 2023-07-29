@@ -11,7 +11,7 @@ from langchain.schema import (
 )
 from langchain.schema.messages import BaseMessage
 
-from langwave.memory import VolatileMemory, FewshotMemory
+from langwave.memory import VolatileChatMemory, FewshotChatMemory
 
 
 class MixedChatMemory(BaseChatMessageHistory, BaseModel):
@@ -20,8 +20,8 @@ class MixedChatMemory(BaseChatMessageHistory, BaseModel):
 
     """ use memories to hold other memory types, assuming they are all chat history"""
 
-    fewshot_memory: FewshotMemory = FewshotMemory()
-    _volatile_memory: VolatileMemory = VolatileMemory()
+    fewshot_memory: FewshotChatMemory = FewshotChatMemory()
+    _volatile_memory: VolatileChatMemory = VolatileChatMemory()
 
     @property
     def messages(self) -> List[BaseMessage]:
