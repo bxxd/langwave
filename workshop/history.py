@@ -3,6 +3,7 @@ import logging
 
 import langwave
 from langwave.memory import VolatileChatMemory, MixedChatMemory
+from langwave.chains.wave import ChatWave
 
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts.chat import (
@@ -19,6 +20,21 @@ log = logging.getLogger(__name__)
 
 async def test_history():
     log.info("test_history")
+
+    # memory = VolatileChatMemory()
+
+    llm = OpenAI(verbose=True, temperature=0.2)
+
+    wave = ChatWave.from_llm(llm)
+
+    log.info(f"wave: {wave} memory: {wave.memory}")
+
+    resp = await wave.acall("hi there!")
+    log.info(f"resp: {resp}")
+
+
+async def test_history2():
+    log.info("test_history2")
     memory = MixedChatMemory(memory_key="chat_history", return_messages=True)
 
     chat_history = MessagesPlaceholder(variable_name="chat_history")

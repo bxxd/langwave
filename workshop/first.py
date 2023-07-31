@@ -14,7 +14,9 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from langchain.prompts.chat import ChatPromptTemplate
 
-from langwave.chains.chat_wave import ChatWave
+from langwave.chains.wave import ChatWave
+
+from langchain.chains import LLMChain
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +64,20 @@ async def test_conversation():
     history = ChatMessageHistory()
 
     history.add_user_message("hi")
+    history.add_user_message("i am brian")
+    history.add_user_message("i am a human")
+    history.add_user_message("i love you")
+    history.add_user_message("what is my name?")
+
+    prompt = ChatPromptTemplate.from_template("{input}")
+
+    chain = LLMChain(llm=chat, prompt=prompt)
+
+    resp = await chat.apredict_messages(history.messages)
+    print("\n")
+
+    history.add_message(resp)
+    history.add_user_message("i just told you my name?")
 
     resp = await chat.apredict_messages(history.messages)
 
@@ -78,8 +94,8 @@ def test_memory():
 async def main(args):
     log.info("Hello there!")
     # test_memory()
-    # await test_conversation()
-    await test_wave(args)
+    await test_conversation()
+    # await test_wave(args)
 
 
 import argparse
